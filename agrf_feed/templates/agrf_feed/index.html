@@ -1,0 +1,40 @@
+{% extends 'agrf_feed/agrf_feed.html' %}
+{% block agrf %}
+    {% block title %}
+        <title>AGRF | GS Uploader</title>
+    {% endblock %}
+    {% block heading %}
+        <h2>AGRF GenomeSpace Uploader</h2>
+    {% endblock %}
+    {% block content %}
+        <p>This application allows you to upload your AGRF files to either:</p>
+        <ul>
+            <li>The international <a
+                    href="https://gsui.genomespace.org/jsui/">GenomeSpace</a>
+            </li>
+            <li>The Australian <a
+                    href="https://genomespace.genome.edu.au/jsui/">GenomeSpace</a>
+            </li>
+        </ul>
+        <p>Before you do this, you need to have an account with your target
+           GenomeSpace. You also will need to have enough storage available to
+           the target GenomeSpace to accommodate your file.</p>
+        <p>To use this application you have to:</p>
+        <ul>
+            {% if not user.is_authenticated %}
+                <li><a href="{% url 'login' %}">Login </a> to it.</li>
+            {% endif %}
+            <li><a href="{% url 'agrf:files' %}">Choose the files</a>
+                you want to upload to the GenomeSpace.
+            </li>
+            {% if not request.session.xrd_location %}
+                <li><a href="{% url 'agrf:gs_login' %}">Login to your target
+                                                        GenomeSpace</a></li>
+            {% endif %}
+            <li>Choose your directory in the GenomeSpace and hit the "upload"
+                button.
+            </li>
+        </ul>
+
+    {% endblock %}
+{% endblock %}

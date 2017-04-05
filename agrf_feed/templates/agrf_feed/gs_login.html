@@ -1,0 +1,24 @@
+{% extends 'agrf_feed/agrf_feed.html' %}
+{% block title %}
+    <title>AGRF | GS Login</title>
+    {% load static %}
+    <link href="{% static "/css/spinner.css" %}" rel="stylesheet"/>
+{% endblock %}
+{% block heading %}
+    <h2>Login to the GenomeSpace</h2>
+{% endblock %}
+{% block content %}
+    <form method="post" action="{% url 'agrf:gs_login' %}">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" name="gs_login" value="Login to the GenomeSpace"
+               onclick="utils.spin(); return true">
+    </form>
+{% endblock %}
+{% block scripts %}
+    <div id="d_cover">
+        {#  used to cover the screen once the form is submitted  #}
+    </div>
+    <script src="{% static "/js/spin.js" %}"></script>
+    <script src="{% static "/js/launch_spinner.js" %}"></script>
+{% endblock %}

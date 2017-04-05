@@ -1,0 +1,24 @@
+{% extends 'agrf_feed/agrf_feed.html' %}
+{% block title %}
+    <title>AGRF | GS Target</title>
+    {% load static %}
+    <link href="{% static "/css/spinner.css" %}" rel="stylesheet"/>
+{% endblock %}
+{% block heading %}
+    <h2>AGRF GenomeSpace Target</h2>
+{% endblock %}
+{% block content %}
+    <form method="post" action="{% url 'agrf:target_selector' %}">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" name="upload" value="Upload!"
+               onclick="utils.spin(); return true">
+    </form>
+    <div id="d_cover">
+        {#  used to cover the screen once the form is submitted  #}
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static "/js/spin.js" %}"></script>
+    <script src="{% static "/js/launch_spinner.js" %}"></script>
+{% endblock %}

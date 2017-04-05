@@ -1,0 +1,25 @@
+{% extends 'agrf_feed/agrf_feed.html' %}
+
+{% block title %}
+    <title>AGRF | File Listing</title>
+    {% load static %}
+    <link href="{% static "/css/spinner.css" %}" rel="stylesheet"/>
+{% endblock %}
+{% block heading %}
+    <h2 id="foo">AGRF File Listing</h2>
+{% endblock %}
+{% block content %}
+    <form method="post" action="{% url 'agrf:files' %}" id="f_file_selector">
+        {% csrf_token %}
+        {{ form }}
+        <input id="b_submit" type="submit" name="select_files" value="Select"
+               onclick="utils.spin(); return true">
+    </form>
+    <div id="d_cover">
+        {#  used to cover the screen once the form is submitted  #}
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static "/js/spin.js" %}"></script>
+    <script src="{% static "/js/launch_spinner.js" %}"></script>
+{% endblock %}

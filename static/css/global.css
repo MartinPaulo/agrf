@@ -1,0 +1,45 @@
+body {
+    background-color: #FFFFED;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+.messages {
+    border: 3px solid #7070B2;
+    padding: 1em;
+}
+
+.messages .error {
+    background-color: #FFEDFF;
+}
+
+.messages .info {
+    background-color: #F9FFED;
+}
+
+.messages .warning {
+    background-color: #D9D9A9;
+}
+
+form {
+    border: 3px solid #7070B2;
+    padding: 1em;
+}
+
+form input[type=submit] {
+    background-color: #7070B2;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    /*width: 10em;*/
+}
+
+form input[type=text], form input[type=password] {
+    /*width: 20em;*/
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid #7070B2;
+    box-sizing: border-box;
+}

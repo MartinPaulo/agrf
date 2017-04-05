@@ -1,0 +1,3 @@
+django
+python3-openid
+python-genomespaceclient

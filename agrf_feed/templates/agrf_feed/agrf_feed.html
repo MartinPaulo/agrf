@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block agrf %}
+{% endblock %}
+{% block footer %}
+    {# If we are logged into the genomspace put a logout button on the page #}
+    {% if request.session.xrd_location %}
+        <p>
+            <a href="{% url 'agrf:gs_logout' %}"
+            >Logout from {{ request.session.xrd_location }}</a>
+        </p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <p>
+        <a href="{% url 'logout' %}"
+        >Logout from this application</a>
+    </p>
+    {% endif %}
+{% endblock %}
