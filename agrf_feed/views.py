@@ -13,7 +13,7 @@ from genomespaceclient import GenomeSpaceClient
 from openid.consumer import consumer
 
 from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
-    BASE_DIRECTORY
+    BASE_DIRECTORY, CMD_ENVIRONMENT
 from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
@@ -205,7 +205,9 @@ def _move_files_to_gs(dirs, selected_dir, request):
             # client.copy(path, bucket))
             # above fails if not run on main thread, so...
             # also, following will fail if filename has a " in it...
-            cmd = """genomespace -t %s cp %s %s """ % (token, path, bucket)
+
+            cmd = """%s genomespace -t %s cp %s %s """ % (
+                CMD_ENVIRONMENT, token, path, bucket)
             (out, err) = Popen(cmd, stdin=PIPE, stdout=PIPE,
                                stderr=PIPE, close_fds=True,
                                shell=True).communicate(None)

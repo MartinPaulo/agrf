@@ -41,6 +41,8 @@ LOGOUT_TAIL = 'openIdProvider?_action=logout&logout_return_to=' + TRUST_ROOT
 
 # where the files come from..
 BASE_DIRECTORY = ''
+# the command line environment to activate (if any)
+CMD_ENVIRONMENT = ''
 
 # set to wherever you want your static files to live
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
