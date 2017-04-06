@@ -10,7 +10,7 @@ GenomeSpace
 </details>
 
 <details>
- <summary>Installation instructions</summary>
+ <summary>Installation instructions for CentOS 6.8</summary>
  
  ```bash
  # update virgin instance
