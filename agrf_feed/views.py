@@ -12,7 +12,8 @@ from django.views.decorators.cache import never_cache
 from genomespaceclient import GenomeSpaceClient
 from openid.consumer import consumer
 
-from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL
+from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
+    BASE_DIRECTORY
 from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
@@ -142,9 +143,9 @@ def files(request):
             return HttpResponseRedirect('/target_selector')
     else:
         # note trailing slash...
-        source_dir = "/Users/mpaulo/Desktop/Demo/"
+        source_dir = BASE_DIRECTORY
         source = tuple(
-            (html.escape(source_dir + file), file) for file in
+            (html.escape(os.path.join(source_dir, file)), file) for file in
             os.listdir(source_dir) if not file.startswith('.'))
         request.session[S_SOURCE_FILES] = source
         form = FileUploadForm(source)

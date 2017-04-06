@@ -39,6 +39,9 @@ TRUST_ROOT = 'http://127.0.0.1/'
 RETURN_TO_URL = TRUST_ROOT + 'gs_login/?is_return=true'
 LOGOUT_TAIL = 'openIdProvider?_action=logout&logout_return_to=' + TRUST_ROOT
 
+# where the files come from..
+BASE_DIRECTORY = ''
+
 # set to wherever you want your static files to live
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 # STATIC_ROOT = '/var/www/static'
