@@ -3,7 +3,7 @@
 # if (any)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'g8hkvxw54%k-$ymtp90ig*4ai8c%6ra4p@(&m##6b_#g=@0v)!'
+SECRET_KEY = ''
 
 # Debug defaults to False
 DEBUG = False
@@ -26,12 +26,18 @@ MANAGERS = (
 # SERVER_EMAIL = 'agrf@nectar.org.au'
 # DEFAULT_FROM_EMAIL = 'agrf@nectar.org.au'
 
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db', 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.db.backends.sqlite3',
+#         # 'NAME': os.path.join(BASE_DIR, 'db', 'db.sqlite3'),
+#     }
+# }
+
+
+# The OpenID urls (note slash at end of the TRUST ROOT...
+TRUST_ROOT = 'http://127.0.0.1/'
+RETURN_TO_URL = TRUST_ROOT + 'gs_login/?is_return=true'
+LOGOUT_TAIL = 'openIdProvider?_action=logout&logout_return_to=' + TRUST_ROOT
 
 # set to wherever you want your static files to live
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
