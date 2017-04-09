@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 
 
 class PamBackend(object):
+    """
+    I suspect the user running the application must be a member of the 
+    /etc/shadow group (the httpd user on CentOS). If so this should do 
+    the trick:
+    $ sudo usermod -a -G shadow <user>
+    """
     _pam = pam.pam()
 
     def authenticate(self, username=None, password=None):
