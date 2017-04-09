@@ -16,6 +16,7 @@ class PamBackend(object):
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
+                # we don't care what the password is, as it won't be used.
                 password = User.objects.make_random_password()
                 user = User(username=username, password=password)
                 user.save()
