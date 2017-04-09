@@ -131,24 +131,38 @@ def gs_logout(request):
     return redirect(xrd_url)
 
 
+def get_users_files(user):
+    """
+    Path to user data = /ftp-home/$USER/files
+    This application will need permissions to read those directories...
+    """
+    if not user.is_authenticated():
+        # shouldn always be authenticated, but...
+        return tuple()
+    path = "/ftp-home/%s/files" % user.username
+    if not os.path.exists(path):
+        path = BASE_DIRECTORY
+    # should these be html escaped? Check the form library...
+    return tuple((os.path.join(root, name), name)
+                 for root, dirs, files in os.walk(path)
+                 for name in files
+                 if not name.startswith('.'))
+
+
 @never_cache
 @login_required
-def files(request):
+def files_selector(request):
     if request.method == 'POST' and request.session[S_SOURCE_FILES]:
-        source = request.session[S_SOURCE_FILES]
-        form = FileUploadForm(source, request.POST)
+        source_files = request.session[S_SOURCE_FILES]
+        form = FileUploadForm(source_files, request.POST)
         if form.is_valid():
             request.session[S_CHOSEN_FILES] = form.cleaned_data['file_listing']
             request.session[S_SOURCE_FILES] = None
             return HttpResponseRedirect('/target_selector')
     else:
-        # note trailing slash...
-        source_dir = BASE_DIRECTORY
-        source = tuple(
-            (html.escape(os.path.join(source_dir, file)), file) for file in
-            os.listdir(source_dir) if not file.startswith('.'))
-        request.session[S_SOURCE_FILES] = source
-        form = FileUploadForm(source)
+        source_files = get_users_files(request.user)
+        request.session[S_SOURCE_FILES] = source_files
+        form = FileUploadForm(source_files)
     return render(request, 'agrf_feed/files.html', {'form': form})
 
 
