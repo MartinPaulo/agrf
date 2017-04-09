@@ -28,7 +28,7 @@ S_LOCATION = 'xrd_location'  # The location of the GenomeSpace we are using
 S_GS_TOKEN = 'gs-token'  # The GenomeSpace token
 S_GS_USERNAME = 'gs-username'  # The GenomeSpace user name
 S_SOURCE_FILES = 'source_files'  # The list of files we can upload
-S_FILES = 'files'  # The list of files we want to upload
+S_CHOSEN_FILES = 'files'  # The list of files we want to upload
 S_TARGETS = 'targets'  # The list of target directories that we can upload to
 
 
@@ -50,7 +50,7 @@ def _handle_genomespace_callback(request):
         return HttpResponseRedirect('/')
     request.session[S_GS_TOKEN] = token
     request.session[S_GS_USERNAME] = username
-    next_form = '/target_selector' if request.session.get(S_FILES,
+    next_form = '/target_selector' if request.session.get(S_CHOSEN_FILES,
                                                           None) else '/files'
     return HttpResponseRedirect(next_form)
 
@@ -116,7 +116,7 @@ def gs_logout(request):
     # remove genomespace info
     request.session[S_GS_TOKEN] = None
     request.session[S_GS_USERNAME] = None
-    request.session[S_FILES] = None
+    request.session[S_CHOSEN_FILES] = None
     xrd_location = request.session.get(S_LOCATION, None)
     if not xrd_location:
         return HttpResponseRedirect('/')
@@ -138,7 +138,7 @@ def files(request):
         source = request.session[S_SOURCE_FILES]
         form = FileUploadForm(source, request.POST)
         if form.is_valid():
-            request.session[S_FILES] = form.cleaned_data['file_listing']
+            request.session[S_CHOSEN_FILES] = form.cleaned_data['file_listing']
             request.session[S_SOURCE_FILES] = None
             return HttpResponseRedirect('/target_selector')
     else:
@@ -196,7 +196,7 @@ def _move_files_to_gs(dirs, selected_dir, request):
     if target_dir:
         token = request.session[S_GS_TOKEN]
         # client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
-        for escaped_path in request.session[S_FILES]:
+        for escaped_path in request.session[S_CHOSEN_FILES]:
             path = html.unescape(escaped_path)
             file_name = os.path.basename(path)
             bucket = target_dir['url'] + '/' + file_name
@@ -221,7 +221,7 @@ def _move_files_to_gs(dirs, selected_dir, request):
                 messages.add_message(request, messages.INFO, message)
                 logging.info(message)
         # Remove our list of files to upload from the session
-        request.session[S_FILES] = None
+        request.session[S_CHOSEN_FILES] = None
     else:
         messages.add_message(request, messages.ERROR,
                              'No target directory was selected?')
@@ -232,7 +232,7 @@ def _move_files_to_gs(dirs, selected_dir, request):
 @login_required
 @gs_token_required
 def target_selector(request):
-    if not request.session.get(S_FILES, None):
+    if not request.session.get(S_CHOSEN_FILES, None):
         messages.add_message(request, messages.INFO,
                              'Please choose the files you want to upload')
         return HttpResponseRedirect('/files')
