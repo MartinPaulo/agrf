@@ -44,6 +44,13 @@ BASE_DIRECTORY = ''
 # the command line environment to activate (if any)
 CMD_ENVIRONMENT = ''
 
+# add our pam backend to the list of authentication backends being used.
+AUTHENTICATION_BACKENDS = [
+    'pam_auth.backend.PamBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 # set to wherever you want your static files to live
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 # STATIC_ROOT = '/var/www/static'
