@@ -52,6 +52,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sourcerevision.context_processors.source_revision',
             ],
         },
     },
@@ -112,6 +113,11 @@ LOGOUT_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# https://github.com/dobarkod/django-source-revision/issues/1
+SOURCE_REVISION_COMMANDS = [
+    'git --git-dir=%s/.git rev-parse --short HEAD' % BASE_DIR,  # for git
+]
 
 # http://stackoverflow.com/questions/1626326/how-to-manage-local-vs-production-settings-in-django
 try:

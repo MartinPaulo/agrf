@@ -2,3 +2,4 @@ django
 python3-openid
 python-genomespaceclient
 python-pam
+django-source-revision
