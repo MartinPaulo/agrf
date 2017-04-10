@@ -1,13 +1,12 @@
 import pam
 from django.contrib.auth.models import User
+import logging
 
 
 class PamBackend(object):
     """
-    I suspect the user running the application must be a member of the 
-    /etc/shadow group (the httpd user on CentOS). If so this should do 
-    the trick:
-    $ sudo usermod -a -G shadow <user>
+    The user running the application (the apache user on CentOS) 
+    must be a member of the /etc/shadow group. 
     """
     _pam = pam.pam()
 
@@ -21,11 +20,16 @@ class PamBackend(object):
         if self._pam.authenticate(username, password):
             try:
                 user = User.objects.get(username=username)
+                logging.info("User %s logged in." % username)
             except User.DoesNotExist:
                 # we don't care what the password is, as it won't be used.
                 password = User.objects.make_random_password()
                 user = User(username=username, password=password)
                 user.save()
+                logging.info("User %s was created." % username)
+        else:
+            logging.warning('User %s failed to log in. Code: %s Reason: %s' % (
+                username, self._pam.code, self._pam.reason))
         return user
 
     def get_user(self, user_id):
