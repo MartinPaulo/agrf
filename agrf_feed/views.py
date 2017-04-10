@@ -39,14 +39,20 @@ def index(request):
 
 
 def _handle_genomespace_callback(request):
-    token = request.GET.get('openid.ext1.gs-token', None)
-    username = request.GET.get('openid.ext1.gs-username', None)
+    token, username = None, None
+    message = 'GenomeSpace login failed.'
+
+    oid_consumer = consumer.Consumer(request.session, None)
+    info = oid_consumer.complete(request.GET, RETURN_TO_URL)
+
+    if info.status.lower() == consumer.SUCCESS.lower():
+        token = request.GET.get('openid.ext1.gs-token', None)
+        username = request.GET.get('openid.ext1.gs-username', None)
+
     if not token or not username:
-        token = request.COOKIES.get(S_GS_TOKEN, None)
-        username = request.COOKIES.get(S_GS_USERNAME, None)
-    if not token or not username:
-        logging.error("login failed...")
-        messages.add_message(request, messages.ERROR, "Login failed")
+        request.session[S_LOCATION] = None
+        logging.error(message)
+        messages.add_message(request, messages.ERROR, message)
         return HttpResponseRedirect('/')
     request.session[S_GS_TOKEN] = token
     request.session[S_GS_USERNAME] = username
@@ -91,9 +97,11 @@ def gs_login(request):
         if form.is_valid():
             return _do_gs_login(form, request)
     else:
-        if 'true' == request.GET.get('is_return', 'false'):
+        is_return = 'true' == request.GET.get('is_return', 'false')
+        is_cancel = 'true' == request.GET.get('is_cancel', 'false')
+        if is_return or is_cancel:
             return _handle_genomespace_callback(request)
-        form = GenomeSpaceLoginForm(initial={'next': '/target_selector'})
+        form = GenomeSpaceLoginForm()
     return render(request, 'agrf_feed/gs_login.html', {'form': form})
 
 
