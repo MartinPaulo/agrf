@@ -33,9 +33,7 @@ S_TARGETS = 'targets'  # The list of target directories that we can upload to
 
 
 def index(request):
-    # template = loader.get_template('agrf_feed/index.html')
     return render(request, 'agrf_feed/index.html')
-    # return HttpResponse(template.render(request))
 
 
 def _handle_genomespace_callback(request):
