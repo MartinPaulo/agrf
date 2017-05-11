@@ -4,22 +4,24 @@ A Django based GenomeSpace Tool that allows users to import files into the
 GenomeSpace
 
 <details>
- <summary>Still under development</summary>
-     <img src="http://www.textfiles.com/underconstruction/CoCollegeParkGym4011Construction.gif">
-     You have been warned!
+    <summary>Still under development</summary>
+
+<img src="http://www.textfiles.com/underconstruction/CoCollegeParkGym4011Construction.gif">
+You have been warned!
+
 </details>
 
 <details>
     <summary>Notes</summary>
-    
-    ```bash
-    mkfile -n 1g ~/Desktop/LargeTestFile # Make a large file under osx
-    cmp --silent $old $new || echo "files are different" # Compare two files under osx
-    ```
+
+```bash
+mkfile -n 1g ~/Desktop/LargeTestFile # Make a large file under osx
+cmp --silent $old $new || echo "files are different" # Compare two files under osx
+```
 </details>
 
 <details>
- <summary>Installation instructions for CentOS 6.8</summary>
+    <summary>Installation instructions for CentOS 6.8</summary>
  
  ```bash
  # update virgin instance
