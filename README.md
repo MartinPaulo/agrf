@@ -11,8 +11,11 @@ GenomeSpace
 
 <details>
     <summary>Notes</summary>
-    Make a large file under osx: `mkfile -n 1g ~/Desktop/LargeTestFile`
-    Compare two files under osx: `cmp --silent $old $new || echo "files are different"`
+    
+    ```bash
+    mkfile -n 1g ~/Desktop/LargeTestFile # Make a large file under osx
+    cmp --silent $old $new || echo "files are different" # Compare two files under osx
+    ```
 </details>
 
 <details>
