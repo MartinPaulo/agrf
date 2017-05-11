@@ -62,7 +62,6 @@ vi agrf/local_settings.py
     SECRET_KEY = 'Some long garbage string' # http://www.miniwebtool.com/django-secret-key-generator/ - of course, this is 'known'...
     ALLOWED_HOSTS = ['115.146.95.86'] # the ip number of the host
     TRUST_ROOT = 'http://115.146.95.86/' # again, ip number of the host
-    CMD_ENVIRONMENT = 'source /home/ec2-user/agrf/v_agrf/bin/activate;'
     BASE_DIRECTORY = '/home/ec2-user/pictures' # where ever your files are
 python manage.py migrate
 # to test all is ok... Ctrl-C to kill, btw.

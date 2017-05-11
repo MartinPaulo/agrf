@@ -40,4 +40,5 @@ class TargetChooserForm(forms.Form):
         super(TargetChooserForm, self).__init__(*args, **kwargs)
         self.fields['target_directories'].choices = target_choices
         # now select the first entry in the list of choices
-        self.fields['target_directories'].initial = target_choices[0][0]
+        if len(target_choices):
+            self.fields['target_directories'].initial = target_choices[0][0]

@@ -187,13 +187,13 @@ def _list_directories(client, folder_url, username):
         # ignore all the public subdirectories
         if folder.path.startswith('/Home/Public'):
             continue
-        for permission in folder.effectiveAcl["accessControlEntries"]:
-            if "W" == permission["permission"] \
-                    and "User" == permission["sid"]["type"] \
-                    and permission["sid"]["name"] == username:
+        for permission in folder.effectiveAcl.accessControlEntries:
+            if 'W' == permission.permission \
+                    and 'User' == permission.sid.type \
+                    and permission.sid.name == username:
                 # we have a target we can upload a file to
                 entry = {
-                    'owner': folder.owner["name"],
+                    'owner': folder.owner['name'],
                     'name': folder.name,
                     'path': folder.path,
                     'url': folder.url
@@ -214,7 +214,6 @@ def _move_files_to_gs(dirs, selected_dir, request):
             target_dir = target
             break
     if target_dir:
-        token = request.session[S_GS_TOKEN]
         client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
         for escaped_path in request.session[S_CHOSEN_FILES]:
             path = shlex.quote(html.unescape(escaped_path))
@@ -265,5 +264,10 @@ def target_selector(request):
         )
         request.session[S_TARGETS] = target_directories
         targets = tuple((s['path'], s['path']) for s in target_directories)
+        if not len(targets):
+            messages.add_message(request, messages.ERROR,
+                                 'No writeable GenomeSpace directory has been '
+                                 'found?')
+            return HttpResponseRedirect('/files')
         form = TargetChooserForm(targets)
     return render(request, 'agrf_feed/targets.html', {'form': form})
