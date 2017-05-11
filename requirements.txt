@@ -5,4 +5,5 @@ django-source-revision
 # we need a version of the genomespace client that is not yet released
 # and it in turn will load a version of cloudbridge that is not yet released...
 # python-genomespaceclient
+-e git+https://github.com/MartinPaulo/cloudbridge.git@tmp_master#egg=cloudbridge-0.3.1
 -e git+https://github.com/MartinPaulo/python-genomespaceclient.git@agrf_special#egg=python-genomespaceclient
