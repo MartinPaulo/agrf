@@ -10,6 +10,12 @@ GenomeSpace
 </details>
 
 <details>
+    <summary>Notes</summary>
+    Make a large file under osx: `mkfile -n 1g ~/Desktop/LargeTestFile`
+    Compare two files under osx: `cmp --silent $old $new || echo "files are different"`
+</details>
+
+<details>
  <summary>Installation instructions for CentOS 6.8</summary>
  
  ```bash

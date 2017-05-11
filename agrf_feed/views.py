@@ -2,7 +2,6 @@ import html
 import logging
 import os
 import shlex
-from subprocess import Popen, PIPE
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,10 +9,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from genomespaceclient import GenomeSpaceClient
+from genomespaceclient.exceptions import GSClientException
 from openid.consumer import consumer
 
 from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
-    BASE_DIRECTORY, CMD_ENVIRONMENT
+    BASE_DIRECTORY
 from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
@@ -180,29 +180,29 @@ def _list_directories(client, folder_url, username):
     """
     result = []
     folder_contents = client.list(folder_url)
-    for folder in folder_contents["contents"]:
+    for folder in folder_contents.contents:
         # ignore all non directory artifacts
-        if not folder["isDirectory"]:
+        if not folder.isDirectory:
             continue
         # ignore all the public subdirectories
-        if folder['path'].startswith('/Home/Public'):
+        if folder.path.startswith('/Home/Public'):
             continue
-        for permission in folder["effectiveAcl"]["accessControlEntries"]:
+        for permission in folder.effectiveAcl["accessControlEntries"]:
             if "W" == permission["permission"] \
                     and "User" == permission["sid"]["type"] \
                     and permission["sid"]["name"] == username:
                 # we have a target we can upload a file to
                 entry = {
-                    'owner': folder["owner"]["name"],
-                    'name': folder.get("name"),
-                    'path': folder.get("path"),
-                    'url': folder.get("url")
+                    'owner': folder.owner["name"],
+                    'name': folder.name,
+                    'path': folder.path,
+                    'url': folder.url
                 }
                 result.append(entry)
                 break  # no need to carry on looking at permissions
         # look for subdirectories
         result.extend(
-            _list_directories(client, folder.get("url"), username)
+            _list_directories(client, folder.url, username)
         )
     return result
 
@@ -215,26 +215,16 @@ def _move_files_to_gs(dirs, selected_dir, request):
             break
     if target_dir:
         token = request.session[S_GS_TOKEN]
-        # client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
+        client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
         for escaped_path in request.session[S_CHOSEN_FILES]:
-            path = html.unescape(escaped_path)
+            path = shlex.quote(html.unescape(escaped_path))
             file_name = os.path.basename(path)
-            bucket = target_dir['url'] + '/' + file_name
-            path = shlex.quote(path)
-            bucket = shlex.quote(bucket)
-            # client.copy(path, bucket))
-            # above fails if not run on main thread, so...
-            # also, following will fail if filename has a " in it...
-
-            cmd = """%s genomespace -t %s cp %s %s """ % (
-                CMD_ENVIRONMENT, token, path, bucket)
-            (out, err) = Popen(cmd, stdin=PIPE, stdout=PIPE,
-                               stderr=PIPE, close_fds=True,
-                               shell=True).communicate(None)
-            if err:
-                message = """Error uploading %s""" % file_name
+            bucket = shlex.quote(target_dir['url'] + '/' + file_name)
+            try:
+                client.copy(path, bucket)
+            except GSClientException as error:
+                message = """Error uploading %s: %s""" % (file_name, error)
                 messages.add_message(request, messages.ERROR, message)
-                message = "%s as: %s" % (message, err)
                 logging.error(message)
             else:
                 message = """Successfully uploaded %s""" % file_name

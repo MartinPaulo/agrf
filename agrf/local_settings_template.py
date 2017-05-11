@@ -41,8 +41,6 @@ LOGOUT_TAIL = 'openIdProvider?_action=logout&logout_return_to=' + TRUST_ROOT
 
 # where the files come from..
 BASE_DIRECTORY = ''
-# the command line environment to activate (if any)
-CMD_ENVIRONMENT = ''
 
 # add our pam backend to the list of authentication backends being used.
 AUTHENTICATION_BACKENDS = [
