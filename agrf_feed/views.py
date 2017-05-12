@@ -143,16 +143,20 @@ def get_users_files(user):
     This application will need permissions to read those directories...
     """
     if not user.is_authenticated():
-        # shouldn't always be authenticated, but...
+        # should always be authenticated, but...
         return tuple()
     path = "/ftp-home/%s/files" % user.username
     if not os.path.exists(path):
         path = BASE_DIRECTORY
     # should these be html escaped? Check the form library...
-    return tuple((os.path.join(root, name), name)
-                 for root, dirs, files in os.walk(path)
-                 for name in files
-                 if not name.startswith('.'))
+    result = []
+    for root, dirs, files in os.walk(path, topdown=True):
+        for name in files:
+            if not name.startswith('.'):
+                full_path = os.path.join(root, name)
+                offset_path = full_path[len(path):].lstrip('/')
+                result.append((full_path, offset_path))
+    return tuple(result)
 
 
 @never_cache
