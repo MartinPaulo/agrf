@@ -79,13 +79,11 @@ sudo chown root:root -R  /var/www/static/
 
 # setup the apache server
 sudo vi /etc/httpd/conf.d/django.conf
-# The /etc/httpd/conf.d/django.conf file contents is between the "#=== lines"
+# The /etc/httpd/conf.d/django.conf file contents is between the "#===" lines below
 ```
 
 ```
 #==============================================================================
-
-
 Alias /static /var/www/static
 <Directory /var/www/static>
    Satisfy any
@@ -101,7 +99,6 @@ WSGISocketPrefix /var/run/wsgi
 WSGIDaemonProcess agrf python-path=/home/ec2-user/agrf:/home/ec2-user/agrf/v_agrf/lib/python3.4/site-packages
 WSGIProcessGroup agrf
 WSGIScriptAlias / /home/ec2-user/agrf/agrf/wsgi.py
-
 #==============================================================================
 ```
 
