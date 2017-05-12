@@ -17,6 +17,7 @@ You have been warned!
 ```bash
 mkfile -n 1g ~/Desktop/LargeTestFile # Make a large file under osx
 cmp --silent $old $new || echo "files are different" # Compare two files under osx
+fallocate -l 10G test.txt # make a large file under linux
 ```
 </details>
 
@@ -79,7 +80,11 @@ sudo chown root:root -R  /var/www/static/
 # setup the apache server
 sudo vi /etc/httpd/conf.d/django.conf
 # The /etc/httpd/conf.d/django.conf file contents is between the "#=== lines"
+```
+
+```
 #==============================================================================
+
 
 Alias /static /var/www/static
 <Directory /var/www/static>
@@ -98,7 +103,9 @@ WSGIProcessGroup agrf
 WSGIScriptAlias / /home/ec2-user/agrf/agrf/wsgi.py
 
 #==============================================================================
+```
 
+```bash
 # set the needed groups and file permissions
 sudo usermod -a -G ec2-user apache
 chmod 664 db.sqlite3
