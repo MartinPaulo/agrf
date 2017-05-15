@@ -1,7 +1,6 @@
 import html
 import logging
 import os
-import shlex
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -9,7 +8,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from genomespaceclient import GenomeSpaceClient
-from genomespaceclient.exceptions import GSClientException
 from openid.consumer import consumer
 
 from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
@@ -17,13 +15,13 @@ from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
 from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
+# The following are keys used for values stored in the session
+from agrf_feed.tasks import celery_move_files
 
 # Useful links
 # http://www.genomespace.org/support/api/openid-requirements
 # http://identity.genomespace.org/openid/
 # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Authentication
-
-# The following are keys used for values stored in the session
 S_LOCATION = 'xrd_location'  # The location of the GenomeSpace we are using
 S_GS_TOKEN = 'gs-token'  # The GenomeSpace token
 S_GS_USERNAME = 'gs-username'  # The GenomeSpace user name
@@ -218,23 +216,13 @@ def _move_files_to_gs(dirs, selected_dir, request):
             target_dir = target
             break
     if target_dir:
-        client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
-        for escaped_path in request.session[S_CHOSEN_FILES]:
-            path = shlex.quote(html.unescape(escaped_path))
-            file_name = os.path.basename(path)
-            bucket = shlex.quote(target_dir['url'] + '/' + file_name)
-            try:
-                client.copy(path, bucket)
-            except GSClientException as error:
-                message = """Error uploading %s: %s""" % (file_name, error)
-                messages.add_message(request, messages.ERROR, message)
-                logging.error(message)
-            else:
-                message = """Successfully uploaded %s""" % file_name
-                messages.add_message(request, messages.INFO, message)
-                logging.info(message)
-        # Remove our list of files to upload from the session
+        chosen_files = list(request.session[S_CHOSEN_FILES])
         request.session[S_CHOSEN_FILES] = None
+        token = request.session[S_GS_TOKEN]
+        messages.add_message(request, messages.INFO,
+                             'Your chosen files will shortly be moved to the '
+                             'GenomeSpace')
+        celery_move_files.delay(chosen_files, target_dir, token)
     else:
         messages.add_message(request, messages.ERROR,
                              'No target directory was selected?')

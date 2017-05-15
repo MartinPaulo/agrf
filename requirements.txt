@@ -1,3 +1,4 @@
+celery
 django
 python3-openid
 python-pam
