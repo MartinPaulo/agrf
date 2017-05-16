@@ -217,4 +217,19 @@ cd ~/pictures
 wget "https://upload.wikimedia.org/wikipedia/commons/e/ef/Flickr_-_Lukjonis_-_Male_Jumping_spider_-_Evarcha_arcuata_%28Set_of_pictures%29.jpg"
 mv Flickr_-_Lukjonis_-_Male_Jumping_spider_-_Evarcha_arcuata_\(Set_of_pictures\).jpg spider.jpg
 ```
+
+To set up a self signed certificate follow:
+
+* https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-for-centos-6
+
+Then, to get apache to redirect to https, add the following lines to the end of
+`/etc/httpd/conf/httpd.conf`:
+
+```
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
+```
+
+Possibly want to make the `%{REQUEST_URI}` be `%{REQUEST_URI} [R=302,L,QSA]`
 </details>
