@@ -54,7 +54,8 @@ git clone https://github.com/MartinPaulo/agrf.git
 cd agrf
 virtualenv -p python3 v_agrf
 source v_agrf/bin/activate
-pip install django
+pip install django # could take from requirments.txt...
+# check that it works
 django-admin --version
 pip install -r requirements.txt
 cp agrf/local_settings_template.py agrf/local_settings.py
@@ -127,17 +128,18 @@ sudo apachectl start
 sudo chkconfig httpd on
 
 # setup pam access
-
 sudo groupadd agrfshadow
 sudo usermod -aG agrfshadow apache
 sudo chgrp agrfshadow /etc/shadow
 sudo chmod g+r /etc/shadow
 # and check it looks ok...
 sudo stat -c "%U %G" /etc/shadow
+# restart apache to pick it up
+sudo apachectl restart
 
 # to upload files in the background...
 # install rabbitmq
-sudo yum install rabbitmq-server
+sudo yum -y install rabbitmq-server
 sudo /sbin/service rabbitmq-server start
 sudo chkconfig rabbitmq-server on
 sudo rabbitmqctl add_user [rabbit_user] [rabbit_user_password]
@@ -148,6 +150,7 @@ sudo rabbitmqctl set_permissions -p agrfvhost [rabbit_user] ".*" ".*" ".*"
 # to set up celery (try version 4.0?)
 wget https://raw.githubusercontent.com/celery/celery/3.1/extra/generic-init.d/celeryd
 sudo mv celeryd /etc/init.d/celeryd
+sudo chown root:root /etc/init.d/celeryd
 sudo chmod +x /etc/init.d/celeryd
 # create the config file
 sudo vi /etc/default/celeryd
