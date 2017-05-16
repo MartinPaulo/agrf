@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {# We should need this page, as we redirect to the home page on logout #}
+{# by setting LOGOUT_REDIRECT_URL in settings.py #}
 {% block content %}
-<p>Logged out!</p>  
+<p>Logged out!</p>
 
 <a href="{% url 'login'%}">Click here to login again.</a>
 {% endblock %}
