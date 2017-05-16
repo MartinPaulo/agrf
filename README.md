@@ -126,6 +126,88 @@ sudo apachectl start
 # to get apache to restart when vm is rebooted:
 sudo chkconfig httpd on
 
+# setup pam access
+
+sudo groupadd agrfshadow
+sudo usermod -aG agrfshadow apache
+sudo chgrp agrfshadow /etc/shadow
+sudo chmod g+r /etc/shadow
+# and check it looks ok...
+sudo stat -c "%U %G" /etc/shadow
+
+# to upload files in the background...
+# install rabbitmq
+sudo yum install rabbitmq-server
+sudo /sbin/service rabbitmq-server start
+sudo chkconfig rabbitmq-server on
+sudo rabbitmqctl add_user [rabbit_user] [rabbit_user_password]
+sudo rabbitmqctl add_vhost agrfvhost
+sudo rabbitmqctl set_user_tags [rabbit_user] agrftag
+sudo rabbitmqctl set_permissions -p agrfvhost [rabbit_user] ".*" ".*" ".*"
+
+# to set up celery (try version 4.0?)
+wget https://raw.githubusercontent.com/celery/celery/3.1/extra/generic-init.d/celeryd
+sudo mv celeryd /etc/init.d/celeryd
+sudo chmod +x /etc/init.d/celeryd
+# create the config file
+sudo vi /etc/default/celeryd
+# and put the following into it:
+```
+
+```bash
+# Names of nodes to start
+#   most people will only start one node:
+CELERYD_NODES="worker1"
+#   but you can also start multiple and configure settings
+#   for each in CELERYD_OPTS
+#CELERYD_NODES="worker1 worker2 worker3"
+#   alternatively, you can specify the number of nodes to start:
+#CELERYD_NODES=10
+
+# Absolute or relative path to the 'celery' command:
+#CELERY_BIN="/usr/local/bin/celery"
+CELERY_BIN="/home/ec2-user/agrf/v_agrf/bin/celery"
+
+# App instance to use
+# comment out this line if you don't use an app
+CELERY_APP="agrf_feed"
+# or fully qualified:
+#CELERY_APP="proj.tasks:app"
+
+# Where to chdir at start.
+CELERYD_CHDIR="/home/ec2-user/agrf"
+
+# Extra command-line arguments to the worker
+CELERYD_OPTS="--time-limit=300 --concurrency=8"
+# Configure node-specific settings by appending node name to arguments:
+#CELERYD_OPTS="--time-limit=300 -c 8 -c:worker2 4 -c:worker3 2 -Ofair:worker1"
+
+# Set logging level to DEBUG
+CELERYD_LOG_LEVEL="DEBUG"
+
+# %n will be replaced with the first part of the nodename.
+CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+CELERYD_PID_FILE="/var/run/celery/%n.pid"
+
+# Workers should run as an unprivileged user.
+#   You need to create this user manually (or you can choose
+#   a user/group combination that already exists (e.g., nobody).
+CELERYD_USER="ec2-user"
+CELERYD_GROUP="ec2-user"
+
+# If enabled pid and log directories will be created if missing,
+# and owned by the userid/group configured.
+CELERY_CREATE_DIRS=1
+```
+
+```bash
+# to run celery in the background
+sudo chkconfig --add celeryd
+# start celery
+sudo /etc/init.d/celeryd start
+# to check the status of celery...
+sudo /etc/init.d/celeryd status
+
 # and if you want a file to download...
 mkdir ~/pictures
 cd ~/pictures
