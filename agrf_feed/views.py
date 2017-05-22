@@ -1,6 +1,7 @@
 import html
 import logging
 import os
+import time
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,13 +13,12 @@ from openid.consumer import consumer
 from requests import HTTPError
 
 from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
-    BASE_DIRECTORY
+    BASE_DIRECTORY, DAYS_FILES_LIVE_FOR
 from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
 # The following are keys used for values stored in the session
 from agrf_feed.tasks import celery_move_files
-
 # Useful links
 # http://www.genomespace.org/support/api/openid-requirements
 # http://identity.genomespace.org/openid/
@@ -159,7 +159,12 @@ def get_users_files(user):
                 full_path = os.path.join(root, name)
                 offset_path = full_path[len(path):].lstrip('/')
                 size = human_readable(os.path.getsize(full_path))
-                result.append((full_path, f"{offset_path} {size}"))
+                seconds_old = time.time() - os.path.getmtime(full_path)
+                # 86400 = 60 / 60 / 24 = seconds / minutes / hours per day
+                days_to_live = int(DAYS_FILES_LIVE_FOR - (seconds_old / 86400))
+                days_to_live = days_to_live if days_to_live > 0 else 0
+                result.append(
+                    (full_path, f"{offset_path} {size} {days_to_live}"))
     return tuple(result)
 
 

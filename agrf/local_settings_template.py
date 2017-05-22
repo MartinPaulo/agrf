@@ -48,6 +48,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# The number of days a file will live for on the AGRF servers before being
+# removed/deleted
+DAYS_FILES_LIVE_FOR = 30
+
 
 # set to wherever you want your static files to live
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
