@@ -1,6 +1,4 @@
-import datetime
 import math
-import os
 
 
 def human_readable(size: int) -> str:
@@ -15,4 +13,3 @@ def human_readable(size: int) -> str:
     p = math.pow(1024, i)
     s = round(size / p, 2)
     return f'{s} {size_name[i]}'
-
