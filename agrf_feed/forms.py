@@ -7,7 +7,7 @@ class GenomeSpaceLoginForm(forms.Form):
     _server_locations = tuple((location, location) for location in
                               AgrfFeedConfig.get_server_locations())
     xrd_provider = forms.ChoiceField(
-        label='The GenomeSpace to use',
+        label='Choose the:',
         widget=forms.RadioSelect,
         choices=_server_locations
     )
