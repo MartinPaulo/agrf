@@ -14,6 +14,20 @@
         <input type="submit" name="gs_login" value="Login to the GenomeSpace"
                onclick="utils.spin(); return true">
     </form>
+    <div>
+        <h3>Warning!</h3>
+        <p>If you choose a GenomeSpace/bucket that is overseas or
+           on a commercial network you may incur both costs and delays in
+           uploading your files! The <a
+                    href="https://genomespace.genome.edu.au/jsui/"
+                    target="_blank">
+                Australian GenomeSpace</a> combined with buckets in the
+            <a href="https://dashboard.rc.nectar.org.au/project/containers/"
+               target="_blank">
+                NeCTAR object store</a> will ordinarily be your cheapest and
+           fastest solution.
+        </p>
+    </div>
 {% endblock %}
 {% block scripts %}
     <div id="d_cover">
