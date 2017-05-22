@@ -218,12 +218,13 @@ def _move_files_to_gs(dirs, selected_dir, request):
             break
     if target_dir:
         chosen_files = list(request.session[S_CHOSEN_FILES])
+        # Remove our list of files to upload from the session
         request.session[S_CHOSEN_FILES] = None
         token = request.session[S_GS_TOKEN]
+        celery_move_files.delay(chosen_files, target_dir, token)
         messages.add_message(request, messages.INFO,
                              'Your chosen files will shortly be moved to the '
                              'GenomeSpace')
-        celery_move_files.delay(chosen_files, target_dir, token)
     else:
         messages.add_message(request, messages.ERROR,
                              'No target directory was selected?')
