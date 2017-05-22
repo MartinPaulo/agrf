@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from genomespaceclient import GenomeSpaceClient
 from openid.consumer import consumer
+from requests import HTTPError
 
 from agrf.local_settings import TRUST_ROOT, RETURN_TO_URL, LOGOUT_TAIL, \
     BASE_DIRECTORY
@@ -249,17 +250,30 @@ def target_selector(request):
         xrd_location = request.session[S_LOCATION]
         dm_server = AgrfFeedConfig.get_dm_server(xrd_location)
         home_dir = dm_server + "/v1.0/file/Home/"
-        target_directories = _list_directories(
-            client,
-            home_dir,
-            request.session[S_GS_USERNAME]
-        )
-        request.session[S_TARGETS] = target_directories
-        targets = tuple((s['path'], s['path']) for s in target_directories)
-        if not len(targets):
-            messages.add_message(request, messages.ERROR,
-                                 'No writeable GenomeSpace directory has been '
-                                 'found?')
-            return HttpResponseRedirect('/files')
+        try:
+            target_directories = _list_directories(
+                client,
+                home_dir,
+                request.session[S_GS_USERNAME]
+            )
+            request.session[S_TARGETS] = target_directories
+            targets = tuple((s['path'], s['path']) for s in target_directories)
+            if not len(targets):
+                messages.add_message(request, messages.ERROR,
+                                     'No writeable GenomeSpace directory '
+                                     'has been found? Please check your '
+                                     'GenomeSpace account.')
+                return HttpResponseRedirect('/files')
+        except HTTPError as e:
+            status_code = e.response.status_code
+            if status_code == 403:
+                messages.add_message(request, messages.ERROR,
+                                     'The GenomeSpace has forbidden access! '
+                                     'You may be able to fix this by '
+                                     're-entering your cloud '
+                                     'credentials in the GenomeSpace.')
+                return HttpResponseRedirect('/files')
+            else:
+                raise
         form = TargetChooserForm(targets)
     return render(request, 'agrf_feed/targets.html', {'form': form})
