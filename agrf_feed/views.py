@@ -23,6 +23,8 @@ from agrf_feed.tasks import celery_move_files
 # http://www.genomespace.org/support/api/openid-requirements
 # http://identity.genomespace.org/openid/
 # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Authentication
+from agrf_feed.utilities import convert_size
+
 S_LOCATION = 'xrd_location'  # The location of the GenomeSpace we are using
 S_GS_TOKEN = 'gs-token'  # The GenomeSpace token
 S_GS_USERNAME = 'gs-username'  # The GenomeSpace user name
@@ -147,6 +149,8 @@ def get_users_files(user):
     path = "/ftp-home/%s/files" % user.username
     if not os.path.exists(path):
         path = BASE_DIRECTORY
+        logging.error(f"User {user.get_username()} does not have a home "
+                      f"directory!")
     # should these be html escaped? Check the form library...
     result = []
     for root, dirs, files in os.walk(path, topdown=True):
@@ -154,7 +158,8 @@ def get_users_files(user):
             if not name.startswith('.'):
                 full_path = os.path.join(root, name)
                 offset_path = full_path[len(path):].lstrip('/')
-                result.append((full_path, offset_path))
+                size = convert_size(os.path.getsize(full_path))
+                result.append((full_path, f"{offset_path} {size}"))
     return tuple(result)
 
 
