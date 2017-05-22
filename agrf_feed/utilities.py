@@ -1,7 +1,13 @@
+import datetime
 import math
+import os
 
 
-def convert_size(size):
+def human_readable(size: int) -> str:
+    """
+    :param size: A byte size that is to be made human readable.
+    :returns: A string giving a human readable rendition of the parameter
+    """
     if not size:
         return '0B'
     size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
@@ -9,3 +15,4 @@ def convert_size(size):
     p = math.pow(1024, i)
     s = round(size / p, 2)
     return f'{s} {size_name[i]}'
+
