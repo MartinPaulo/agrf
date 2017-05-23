@@ -5,6 +5,7 @@ import time
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
@@ -18,6 +19,7 @@ from agrf_feed.apps import AgrfFeedConfig
 from agrf_feed.forms import FileUploadForm, TargetChooserForm, \
     GenomeSpaceLoginForm
 # The following are keys used for values stored in the session
+from agrf_feed.models import FileDescriptor
 from agrf_feed.tasks import celery_move_files
 # Useful links
 # http://www.genomespace.org/support/api/openid-requirements
@@ -138,19 +140,23 @@ def gs_logout(request):
     return redirect(xrd_url)
 
 
-def get_users_files(user):
+def get_users_files(user: User) -> tuple:
     """
     Path to user data = /ftp-home/$USER/files
     This application will need permissions to read those directories...
+    
+    :param user: The currently logged in user
+    :return: A tuple of the files and their paths that the user can move to 
+             the GenomeSpace
     """
     if not user.is_authenticated():
         # should always be authenticated, but...
         return tuple()
-    path = "/ftp-home/%s/files" % user.username
+    path = f'/ftp-home/{user.get_username()}/files'
     if not os.path.exists(path):
         path = BASE_DIRECTORY
-        logging.error(f"User {user.get_username()} does not have a home "
-                      f"directory!")
+        logging.error(f'User {user.get_username()} does not have a home '
+                      f'directory!')
     # should these be html escaped? Check the form library...
     result = []
     for root, dirs, files in os.walk(path, topdown=True):
@@ -159,12 +165,16 @@ def get_users_files(user):
                 full_path = os.path.join(root, name)
                 offset_path = full_path[len(path):].lstrip('/')
                 size = human_readable(os.path.getsize(full_path))
+                # the last time modified is returned. Hopefully this is usable
+                # here
                 seconds_old = time.time() - os.path.getmtime(full_path)
                 # 86400 = 60 / 60 / 24 = seconds / minutes / hours per day
                 days_to_live = int(DAYS_FILES_LIVE_FOR - (seconds_old / 86400))
                 days_to_live = days_to_live if days_to_live > 0 else 0
+                status = FileDescriptor.get_status(full_path)
                 result.append(
-                    (full_path, f"{offset_path} {size} {days_to_live}"))
+                    (full_path,
+                     f'{offset_path} {size} {days_to_live} {status}'))
     return tuple(result)
 
 
@@ -221,23 +231,37 @@ def _list_directories(client, folder_url, username):
 
 
 def _move_files_to_gs(dirs, selected_dir, request):
+    """ 
+    Moves the selected files to the selected GenomeSpace directory
+    
+    :param dirs: The list of GenomeSpace directories
+    :param selected_dir: The path of the selected GenomeSpace directory
+    :param request: the HTTP request
+    :return: A redirect to the files listing
+    """
+    # which GenomeSpace directory was chosen?
     target_dir = None
     for target in dirs:
         if target['path'] == selected_dir:
             target_dir = target
             break
+    # it is just, just possible that no directory was chosen...
     if target_dir:
         chosen_files = list(request.session[S_CHOSEN_FILES])
-        # Remove our list of files to upload from the session
+        # remove our list of files to upload from the session
         request.session[S_CHOSEN_FILES] = None
         token = request.session[S_GS_TOKEN]
+        for file_path in chosen_files:
+            fd = FileDescriptor.get_file_descriptor_for(file_path)
+            fd.set_uploading()
+            fd.save()
         celery_move_files.delay(chosen_files, target_dir, token)
         messages.add_message(request, messages.INFO,
-                             'Your chosen files will shortly be moved to the '
-                             'GenomeSpace')
+                             'Your selected files will shortly be moved '
+                             'to the GenomeSpace')
     else:
         messages.add_message(request, messages.ERROR,
-                             'No target directory was selected?')
+                             'No target GenomeSpace directory was selected?')
     return HttpResponseRedirect('/files')
 
 
@@ -260,7 +284,7 @@ def target_selector(request):
         client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
         xrd_location = request.session[S_LOCATION]
         dm_server = AgrfFeedConfig.get_dm_server(xrd_location)
-        home_dir = dm_server + "/v1.0/file/Home/"
+        home_dir = dm_server + '/v1.0/file/Home/'
         try:
             target_directories = _list_directories(
                 client,
