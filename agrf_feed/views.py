@@ -164,6 +164,7 @@ def get_users_files(user: User) -> tuple:
             if not name.startswith('.'):
                 full_path = os.path.join(root, name)
                 offset_path = full_path[len(path):].lstrip('/')
+                # could be replaced by {{ value|filesizeformat }} ?
                 size = human_readable(os.path.getsize(full_path))
                 # the last time modified is returned. Hopefully this is usable
                 # here
@@ -174,7 +175,8 @@ def get_users_files(user: User) -> tuple:
                 status = FileDescriptor.get_status(full_path)
                 result.append(
                     (full_path,
-                     f'{offset_path} {size} {days_to_live} {status}'))
+                     f'{offset_path}\N{NULL}{size}\N{NULL}'
+                     f'{days_to_live}\N{NULL}{status}'))
     return tuple(result)
 
 

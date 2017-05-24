@@ -1,0 +1,9 @@
+{% if wrap_label %}
+    <label{% if widget.attrs.id %} for="{{ widget.attrs.id }}"{% endif %}>
+{% endif %}
+{% include "django/forms/widgets/input.html" %}
+{% if wrap_label %}
+    {% load table_splitter %}
+    {{ widget.label | null_split_and_style }}
+    </label>
+{% endif %}

@@ -1,6 +1,15 @@
 from django import forms
+from django.forms import CheckboxSelectMultiple
 
 from agrf_feed.apps import AgrfFeedConfig
+
+
+class NullSplitCheckboxSelectMultiple(CheckboxSelectMultiple):
+    """
+    A multiple select checkbox that splits its labels on the unicode
+    Null character (Null, as null isn't usable in Linux file paths).
+    """
+    option_template_name = 'agrf_feed/null_checkbox_option.html'
 
 
 class GenomeSpaceLoginForm(forms.Form):
@@ -18,9 +27,12 @@ class GenomeSpaceLoginForm(forms.Form):
 
 
 class FileUploadForm(forms.Form):
+    """
+    Uses the NullSplitCheckboxSelectMultiple widget to mark up the options
+    """
     file_listing = forms.MultipleChoiceField(
         label='Select the files to copy to the GenomeSpace',
-        widget=forms.CheckboxSelectMultiple,
+        widget=NullSplitCheckboxSelectMultiple,
         choices=()
     )
 
