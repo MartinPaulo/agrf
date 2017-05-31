@@ -1,12 +1,14 @@
-import logging
 import os
 import time
 
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from genomespaceclient import GenomeSpaceClient
 from genomespaceclient.exceptions import GSClientException
 
 from agrf_feed.models import FileDescriptor
+
+logging = get_task_logger(__name__)
 
 
 @shared_task
