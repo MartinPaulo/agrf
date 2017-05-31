@@ -29,12 +29,12 @@ def celery_move_files(chosen_files, target_dir, token):
             client.copy(path, bucket)
             elapsed_time = time.time() - start_time
             bytes_moved = os.path.getsize(path)
-            logging.info(f"{bytes_moved} bytes moved "
-                         f"in {elapsed_time} seconds")
+            logging.info(
+                '%s bytes moved in %.2f seconds' % (bytes_moved, elapsed_time))
         except GSClientException as error:
-            logging.error(f"Error uploading {file_name}: {error}")
+            logging.error('Error uploading %s: %s' % (file_name, error))
             fd.set_failed_upload()
         else:
-            logging.info(f"Successfully uploaded {file_name}")
+            logging.info('Successfully uploaded %s' % file_name)
             fd.set_uploaded()
         fd.save()

@@ -7,7 +7,7 @@ class FileDescriptor(models.Model):
     """
     A wrapper around the status and path of a file that allows the status to
     be remembered for display to the user.
-    
+
     There is an assumption in this model that each file's path will always be
     unique. In order for this to be true the agrf can't recycle file names.
     TODO: check if this is indeed the case. If it's not some confusion will
@@ -32,7 +32,7 @@ class FileDescriptor(models.Model):
         default=NEW)
 
     def __str__(self):
-        return f'{self.path} {self.exported}'
+        return '%s %s' % (self.path, self.exported)
 
     class Meta:
         ordering = ['path']
@@ -62,7 +62,7 @@ class FileDescriptor(models.Model):
     def get_status(path):
         """
         :param path: The path of the file whose status is desired.
-        :return: A string giving the file status. If no file found, then 
+        :return: A string giving the file status. If no file found, then
                  the FileDescriptor.NEW status string
         """
         try:

@@ -144,19 +144,19 @@ def get_users_files(user: User) -> tuple:
     """
     Path to user data = /ftp-home/$USER/files
     This application will need permissions to read those directories...
-    
+
     :param user: The currently logged in user
-    :return: A tuple of the files and their paths that the user can move to 
+    :return: A tuple of the files and their paths that the user can move to
              the GenomeSpace
     """
     if not user.is_authenticated():
         # should always be authenticated, but...
         return tuple()
-    path = f'/ftp-home/{user.get_username()}/files'
+    path = '/ftp-home/%s/files' % user.get_username()
     if not os.path.exists(path):
         path = BASE_DIRECTORY
-        logging.error(f'User {user.get_username()} does not have a home '
-                      f'directory!')
+        logging.error(
+            'User %s does not have a home directory!' % user.get_username())
     # should these be html escaped? Check the form library...
     result = []
     for root, dirs, files in os.walk(path, topdown=True):
@@ -174,9 +174,8 @@ def get_users_files(user: User) -> tuple:
                 days_to_live = days_to_live if days_to_live > 0 else 0
                 status = FileDescriptor.get_status(full_path)
                 result.append(
-                    (full_path,
-                     f'{offset_path}\N{NULL}{size}\N{NULL}'
-                     f'{days_to_live}\N{NULL}{status}'))
+                    (full_path, '%s\N{NULL}%s\N{NULL}%s\N{NULL}%s' % (
+                        offset_path, size, days_to_live, status)))
     return tuple(result)
 
 
@@ -233,9 +232,9 @@ def _list_directories(client, folder_url, username):
 
 
 def _move_files_to_gs(dirs, selected_dir, request):
-    """ 
+    """
     Moves the selected files to the selected GenomeSpace directory
-    
+
     :param dirs: The list of GenomeSpace directories
     :param selected_dir: The path of the selected GenomeSpace directory
     :param request: the HTTP request

@@ -12,22 +12,21 @@ def null_split_and_style(text, autoescape=True):
     """
     Expects the text argument to have three unicode nulls in it: \N{NULL}
     The text is split on these nulls and marked up inline.
-    
+
     :param text: The text to be split and marked up
     :param autoescape: Should the conditional escape function be used or not?
     :return: The marked up text input
     """
     widths = [20, 9, 3, 10]
     align = ['left', 'right', 'right', 'left']
-    titles =['Name', 'Size', 'Days until deletion', 'Status']
+    titles = ['Name', 'Size', 'Days until deletion', 'Status']
     if autoescape:
         esc = conditional_escape
     else:
         esc = lambda x: x
     result = ''
     for index, section in enumerate(text.split('\N{NULL}')):
-        result += f'<span title="{titles[index]}" style="' \
-                  f'display: inline-block; ' \
-                  f'width: {widths[index]}em; ' \
-                  f'text-align: {align[index]}">{esc(section)}</span>&nbsp;'
+        result += '<span title="%s" style="display: inline-block; ' \
+                  'width: %sem; text-align: %s">%s</span>&nbsp;' % (
+                      titles[index], widths[index], align[index], esc(section))
     return mark_safe(result)
