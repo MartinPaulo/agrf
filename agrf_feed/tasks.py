@@ -1,6 +1,6 @@
-import html
 import logging
 import os
+import time
 
 from celery import shared_task
 from genomespaceclient import GenomeSpaceClient
@@ -25,13 +25,16 @@ def celery_move_files(chosen_files, target_dir, token):
         bucket = target_dir['url'] + '/' + file_name
         fd = FileDescriptor.get_file_descriptor_for(path)
         try:
+            start_time = time.time()
             client.copy(path, bucket)
+            elapsed_time = time.time() - start_time
+            bytes_moved = os.path.getsize(path)
+            logging.info(f"{bytes_moved} bytes moved "
+                         f"in {elapsed_time} seconds")
         except GSClientException as error:
-            message = """Error uploading %s: %s""" % (file_name, error)
-            logging.error(message)
+            logging.error(f"Error uploading {file_name}: {error}")
             fd.set_failed_upload()
         else:
-            message = """Successfully uploaded %s""" % file_name
-            logging.info(message)
+            logging.info(f"Successfully uploaded {file_name}")
             fd.set_uploaded()
         fd.save()
