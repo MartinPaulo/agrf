@@ -175,7 +175,7 @@ def get_users_files(user: User) -> tuple:
                 status = FileDescriptor.get_status(full_path)
                 result.append(
                     (full_path, '%s\N{NULL}%s\N{NULL}%s\N{NULL}%s' % (
-                        offset_path, size, days_to_live, status)))
+                        offset_path, size, status, days_to_live)))
     return tuple(result)
 
 

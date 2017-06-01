@@ -17,9 +17,9 @@ def null_split_and_style(text, autoescape=True):
     :param autoescape: Should the conditional escape function be used or not?
     :return: The marked up text input
     """
-    widths = [20, 9, 3, 10]
-    align = ['left', 'right', 'right', 'left']
-    titles = ['Name', 'Size', 'Days until deletion', 'Status']
+    widths = [40, 14, 16, 4]
+    align = ['left', 'right', 'center', 'right']
+    titles = ['Name', 'Size', 'Status', 'Days until deletion']
     if autoescape:
         esc = conditional_escape
     else:
@@ -27,6 +27,7 @@ def null_split_and_style(text, autoescape=True):
     result = ''
     for index, section in enumerate(text.split('\N{NULL}')):
         result += '<span title="%s" style="display: inline-block; ' \
-                  'width: %sem; text-align: %s">%s</span>&nbsp;' % (
+                  'width: %sch; text-align: %s">%s</span>&nbsp;' % (
                       titles[index], widths[index], align[index], esc(section))
+    result += 'days until deletion'
     return mark_safe(result)
