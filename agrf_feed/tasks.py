@@ -1,6 +1,7 @@
 import os
 import time
 
+from billiard.exceptions import SoftTimeLimitExceeded
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from genomespaceclient import GenomeSpaceClient
@@ -11,7 +12,8 @@ from agrf_feed.models import FileDescriptor
 logging = get_task_logger(__name__)
 
 
-@shared_task
+# Set the time limit for this task to two hours...
+@shared_task(time_limit=7200)
 def celery_move_files(chosen_files, target_dir, token):
     client = GenomeSpaceClient(token=token)
     # common prefix doesn't return the common path: but rather
@@ -36,6 +38,9 @@ def celery_move_files(chosen_files, target_dir, token):
                 '%s bytes moved in %.2f seconds' % (bytes_moved, elapsed_time))
         except GSClientException as error:
             logging.error('Error uploading %s: %s' % (file_name, error))
+            fd.set_failed_upload()
+        except SoftTimeLimitExceeded:
+            logging.error('Soft time limit exceed for %s' % path)
             fd.set_failed_upload()
         else:
             logging.info('Successfully uploaded %s' % file_name)
