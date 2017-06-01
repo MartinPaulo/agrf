@@ -309,6 +309,13 @@ def target_selector(request):
                                      're-entering your cloud '
                                      'credentials in the GenomeSpace.')
                 return HttpResponseRedirect('/files')
+            elif status_code == 500:
+                messages.add_message(request, messages.ERROR,
+                                     'The GenomeSpace has experienced an '
+                                     'internal server error! '
+                                     'Please report this to '
+                                     'help@genome.edu.au')
+                return HttpResponseRedirect('/files')
             else:
                 raise
         form = TargetChooserForm(targets)
