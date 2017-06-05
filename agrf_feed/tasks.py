@@ -31,7 +31,7 @@ def celery_move_files(chosen_files, target_dir, token):
         bucket = target_dir['url'] + '/' + file_name
         fd = FileDescriptor.get_file_descriptor_for(path)
         try:
-            logging.info('About to move %s' % path)
+            logging.info('About to move %s to %s' % (path, bucket))
             start_time = time.time()
             client.copy(path, bucket)
             elapsed_time = time.time() - start_time
