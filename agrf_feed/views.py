@@ -156,7 +156,8 @@ def get_users_files(user: User) -> tuple:
     if not os.path.exists(path):
         path = BASE_DIRECTORY
         logging.error(
-            'User %s does not have a home directory!' % user.get_username())
+            'User %s does not have a home directory! Using: %s' % (
+                user.get_username(), path))
     # should these be html escaped? Check the form library...
     result = []
     for root, dirs, files in os.walk(path, topdown=True):
