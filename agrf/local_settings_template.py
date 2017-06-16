@@ -42,6 +42,9 @@ LOGOUT_TAIL = 'openIdProvider?_action=logout&logout_return_to=' + TRUST_ROOT
 # where the files come from..
 BASE_DIRECTORY = ''
 
+ENVIRONMENT_NAME='Production'
+ENVIRONMENT_COLOR='red'
+
 # add our pam backend to the list of authentication backends being used.
 AUTHENTICATION_BACKENDS = [
     'pam_auth.backend.PamBackend',
