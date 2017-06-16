@@ -5,7 +5,7 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 from django.conf.urls import url, include
 from django.contrib import admin
 
-admin.site.site_header = 'AGRF Data Importer'
+admin.site.site_header = 'AGRF GenomeSpace Uploader'
 admin.site.site_title = 'AGRF'
 
 urlpatterns = [
