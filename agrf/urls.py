@@ -6,7 +6,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^uom_admin/', admin.site.urls, name='admin'),
     # Add Django site authentication urls (for login, logout, etc...)
     url(r'^accounts/', include('django.contrib.auth.urls')),
     # Our agrf application
