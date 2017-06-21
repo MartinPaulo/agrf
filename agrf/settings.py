@@ -122,6 +122,10 @@ SOURCE_REVISION_COMMANDS = [
     'git --git-dir=%s/.git rev-parse --short HEAD' % BASE_DIR,  # for git
 ]
 
+# Set the default to production (rather err on the side of caution)
+ENVIRONMENT_NAME='Production'
+ENVIRONMENT_COLOR='red'
+
 # http://stackoverflow.com/questions/1626326/how-to-manage-local-vs-production-settings-in-django
 try:
     from agrf.local_settings import *
