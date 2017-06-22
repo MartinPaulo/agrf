@@ -19,6 +19,15 @@ mkfile -n 1g ~/Desktop/LargeTestFile # Make a large file under osx
 cmp --silent $old $new || echo "files are different" # Compare two files under osx
 fallocate -l 10G test.txt # make a large file under linux
 ```
+
+http://docs.celeryproject.org/en/3.1/tutorials/daemonizing.html
+
+When developing, start rabbitmq & celery:
+
+    rabbitmq-server
+    
+    celery -A agrf_feed worker -l info
+
 </details>
 
 <details>
@@ -232,4 +241,58 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}
 ```
 
 Possibly want to make the `%{REQUEST_URI}` be `%{REQUEST_URI} [R=302,L,QSA]`
+</details>
+
+
+<details>
+    <summary>SELinux</summary>
+    
+The following might be handy if selinux is in use:
+
+```bash
+# enable apache to read the application files and default files directory
+semanage fcontext -a -t httpd_sys_content_t "/home/noisyroom/agrf(/.*)?" 
+semanage fcontext -a -t httpd_sys_content_t "/home/noisyroom/default(/.*)?"
+restorecon -r -v /home/noisyroom
+
+# enable apache to read the users home directories
+semanage fcontext -a -t httpd_sys_content_t "/ftp-home(/.*)?"
+restorecon -r -v /ftp-home
+
+# https://www.centos.org/docs/5/html/5.2/Deployment_Guide/sec-sel-enable-disable-enforcement.html
+sestatus | grep -i mode
+setenforce 0    # make permissive
+setenforce 1    # make enforcing
+ls -Z   /somedirectory # see the selinux labels
+sestatus -b | grep httpd # see the values of the boolean flags for httpd
+
+setsebool -P httpd_tmp_exec 1 # allow apache to access the tmp directory
+setsebool -P allow_httpd_mod_auth_pam 1 # allow apache to use pam
+setsebool -P httpd_can_network_connect 1 # not needed as following line is better
+semanage port -m -t http_port_t -p tcp 5672 # allow apache to connect to rabbit
+
+semodule -DB # to disable dontaudit settings
+semodule -B # to reenable dontaudit settings
+```
+
+</details>
+
+<details>
+    <summary>Todo after handover</summary>
+
+* Use the actual production versions of python-genomespaceclient and 
+  cloudbridge. We are currently downloading and using custom versions of these
+  libraries, as they hadn't been released with the features we needed.
+* Switch the database from being an sqlite one in the same directory as the 
+  application to either being in a separate directory, or a properly installed
+  database such as mysql.
+* Improve the logging: currently we write to the apache log files, and we don't
+  do things such as rotating the logs etc... We should manage them all a little
+  better - and be able to set the log levels.
+* Change the password reset process...
+* Possibly add 403.html and 400.html error pages.
+* Sort out the genomespace deleting of large files (doesn't work for our 
+  uploads...)
+* Test harness needs to be built...
+
 </details>
