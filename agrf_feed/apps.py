@@ -8,7 +8,7 @@ URLS = {
     # The location of file containing australian GS server urls.
     'Australian GenomeSpace': 'https://genomespace.genome.edu.au/config/v1.0/serverurl.properties',
     # The permanent location of file containing international GS server urls.
-    'International GenomeSpace': 'https://dm.genomespace.org/config/v1.0/serverurl.properties',
+    # 'International GenomeSpace': 'https://dm.genomespace.org/config/v1.0/serverurl.properties',
 }
 
 

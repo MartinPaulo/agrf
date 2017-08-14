@@ -271,10 +271,13 @@ def _move_files_to_gs(dirs, selected_dir, request):
 @login_required
 @gs_token_required
 def target_selector(request):
+    # if the user has no files selected for upload, select them first
     if not request.session.get(S_CHOSEN_FILES, None):
         messages.add_message(request, messages.INFO,
                              'Please choose the files you want to upload')
         return HttpResponseRedirect('/files')
+    # the user has files selected, has selected a genomespace, and the
+    # directories the files are to go to, so move the files...
     if request.method == 'POST' and request.session[S_TARGETS]:
         target_directories = request.session[S_TARGETS]
         targets = tuple((s['path'], s['name']) for s in target_directories)
@@ -282,7 +285,10 @@ def target_selector(request):
         if form.is_valid():
             selected_dir = form.cleaned_data['target_directories']
             return _move_files_to_gs(target_directories, selected_dir, request)
+        # else just show them the form again, populated with their choices
     else:
+        # the user has files selected, has selected a genomespace, but we
+        # don't know what their target directory will be, so ask them...
         client = GenomeSpaceClient(token=request.session[S_GS_TOKEN])
         xrd_location = request.session[S_LOCATION]
         dm_server = AgrfFeedConfig.get_dm_server(xrd_location)

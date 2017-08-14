@@ -7,18 +7,25 @@
         <h2>AGRF GenomeSpace Uploader</h2>
     {% endblock %}
     {% block content %}
-        <p>This application allows you to upload your AGRF files to either:</p>
-        <ul>
-            <li>The <a href="https://gsui.genomespace.org/jsui/"
-                       target="_blank">International GenomeSpace</a>
-            </li>
-            <li>The <a href="https://genomespace.genome.edu.au/jsui/"
-                       target="_blank">Australian GenomeSpace</a>
-            </li>
-        </ul>
-        <p>Before you do this, you need to have an account with your target
-           GenomeSpace. You also will need to have enough storage available to
-           the target GenomeSpace to accommodate your file.</p>
+        {# <p>This application allows you to upload your AGRF files to either:</p>#}
+        {# <ul>#}
+        {#     <li>The <a href="https://gsui.genomespace.org/jsui/"#}
+        {#                target="_blank">International GenomeSpace</a>#}
+        {#     </li>#}
+        {#     <li>The <a href="https://genomespace.genome.edu.au/jsui/"#}
+        {#                target="_blank">Australian GenomeSpace</a>#}
+        {#     </li>#}
+        {# </ul>#}
+        <p>This application allows you to upload your AGRF files to the
+            <a href="https://genomespace.genome.edu.au/jsui/"
+               target="_blank">Australian GenomeSpace</a>
+        </p>
+        {# <p>Before you do this, you need to have an account with your target#}
+        {#    GenomeSpace. You also will need to have made enough storage available to#}
+        {#    the target GenomeSpace to accommodate your files.</p>#}
+        <p>Before you do this, you need to have an account with the
+           GenomeSpace. You also will need to have made enough storage
+           available to the GenomeSpace to accommodate your files.</p>
         <p>To use this application you have to:</p>
         <ul>
             {% if not user.is_authenticated %}
@@ -31,8 +38,8 @@
                 <li><a href="{% url 'agrf:gs_login' %}">Login to your target
                                                         GenomeSpace</a></li>
             {% endif %}
-            <li>Choose your directory in the GenomeSpace and hit the "upload"
-                button.
+            <li>Choose your target directory in the GenomeSpace and hit the
+                "upload" button.
             </li>
         </ul>
 
