@@ -9,9 +9,29 @@
     <h2 id="foo">AGRF File Listing</h2>
 {% endblock %}
 {% block content %}
+    <script language="JavaScript">
+        function toggle(source) {
+            {# following is brittle: the 'file_listing' name #}
+            {# must match the name given in the FileUploadForm #}
+            var checkboxes = document.getElementsByName('file_listing');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].type === "checkbox") {
+                    checkboxes[i].checked = source.checked;
+                }
+            }
+        }
+    </script>
     <form method="post" action="{% url 'agrf:files' %}" id="f_file_selector">
         {% csrf_token %}
         {{ form }}
+        <ul>
+            <li>
+                <label>
+                    <input type="checkbox" onClick="toggle(this)"/>
+                </label><b>Select all files</b>
+            </li>
+        </ul>
+
         <input id="b_submit" type="submit" name="select_files" value="Select"
                onclick="utils.spin(); return true">
     </form>
